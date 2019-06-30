@@ -26,6 +26,7 @@ public abstract class BaseActivityImpl<T extends Object, K extends Object> {
         return response;
     }
 
+    // validate the request here
     protected abstract void validateRequest();
 
     protected K doIdempotencyCheck() {
@@ -33,6 +34,7 @@ public abstract class BaseActivityImpl<T extends Object, K extends Object> {
         return null;
     }
 
+    // put the business logic here
     protected abstract K doExecute();
 
     protected K doExecuteIdempotent() {
