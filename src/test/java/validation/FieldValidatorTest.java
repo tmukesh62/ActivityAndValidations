@@ -18,41 +18,59 @@ import static org.junit.Assert.assertEquals;
 public class FieldValidatorTest {
 
     @Test
+    public void testValidateNullObject() {
+        // execute
+        final ValidationResult result = new FieldsValidator<>(null).validate();
+
+        // verify
+        assertNotNull(result);
+        assertFalse(result.isValid());
+        assertEquals(1, result.getErrorMessages().size());
+        assertEquals("The input is null", result.getErrorMessages().get(0));
+    }
+
+    @Test
     public void testValidateFailed() {
-        FooActivityRequest request = new FooActivityRequest();
+        // setup
+        final FooActivityRequest request = new FooActivityRequest();
         request.setText("");
         request.setItems(new ArrayList<>());
 
-        ValidationResult result = new FieldsValidator<>(request)
+        // execute
+        final ValidationResult result = new FieldsValidator<>(request)
                 .with("num", new RequiredRule())
                 .with("text", new NonEmptyStringRule())
                 .with("text", new SupportedValuesRule<>(Arrays.asList(new String[]{"ABC", "CBS"})))
                 .with("items", new NonEmptyCollectionRule())
                 .validate();
 
+        // verify
         assertNotNull(result);
         assertFalse(result.isValid());
-        assertEquals("The field num is required but not present", result.getErrorMessages().get(0));
-        assertEquals("The text of field text can not be empty", result.getErrorMessages().get(1));
-        assertEquals("The field text can only have values in (ABC, CBS) but found ",
-                result.getErrorMessages().get(2));
-        assertEquals("The collection items can not be empty", result.getErrorMessages().get(3));
+        assertEquals(4, result.getErrorMessages().size());
+        assertTrue(result.getErrorMessages().contains("The field num is required but not present"));
+        assertTrue(result.getErrorMessages().contains("The text of field text can not be empty"));
+        assertTrue(result.getErrorMessages().contains("The field text can only have values in (ABC, CBS) but found "));
+        assertTrue(result.getErrorMessages().contains("The collection items can not be empty"));
     }
 
     @Test
     public void testValidateSuccessful() {
-        FooActivityRequest request = new FooActivityRequest();
+        // setup
+        final FooActivityRequest request = new FooActivityRequest();
         request.setNum(100);
         request.setText("ABC");
         request.setItems(new ArrayList<>(Arrays.asList(new Double[]{ 0.01 })));
 
-        ValidationResult result = new FieldsValidator<>(request)
+        // execute
+        final ValidationResult result = new FieldsValidator<>(request)
                 .with("num", new RequiredRule())
                 .with("text", new NonEmptyStringRule())
                 .with("text", new SupportedValuesRule<>(Arrays.asList(new String[]{"ABC", "CBS"})))
                 .with("items", new NonEmptyCollectionRule())
                 .validate();
 
+        // verify
         assertNotNull(result);
         assertTrue(result.isValid());
         assertEquals(0, result.getErrorMessages().size());

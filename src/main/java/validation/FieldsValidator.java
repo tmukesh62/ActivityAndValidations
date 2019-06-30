@@ -1,6 +1,7 @@
 package validation;
 
 import validation.exceptions.ValidationException;
+import validation.rules.RequiredRule;
 import validation.rules.ValidationRule;
 
 import java.lang.reflect.Field;
@@ -10,6 +11,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class FieldsValidator<T extends Object> {
+    private static final String MESSAGE_FOR_NULL_INPUT = "The input is null";
+
     private final T object;
     private Map<String, Set<ValidationRule>> validationRulesByField;
 
@@ -30,6 +33,13 @@ public class FieldsValidator<T extends Object> {
 
     public ValidationResult validate() {
         ValidationResult result = new ValidationResult();
+
+        try {
+            new RequiredRule().validate("RequestObject", object);
+        } catch (ValidationException e) {
+            result.addErrorMessage(MESSAGE_FOR_NULL_INPUT);
+            return result;
+        }
 
         validationRulesByField.keySet().stream()
                 .forEach(
