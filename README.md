@@ -3,8 +3,7 @@
 * validation
 
 ### How to use activity
-Activity provides a standard structure that we can follow for all the Api implementations. 
-What we get by default is logging, metrics(in progress), basic validations, etc.
+The idea is to isolate the business logic from the API classes and test them in isolation. Activity provides a standard structure that we can follow for any API implementation. What we get by default is logging, metrics(in progress), basic validations, etc. All the business logic goes into the ActivityImpl class.
 
 * Write a class that contains business logic like this:
 
