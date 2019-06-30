@@ -35,3 +35,7 @@ ValidationResult{
     "The collection items can not be empty"]
 }
 ```
+
+#### How to add a new validation rule?
+
+* Adding a new rule is pretty straightforward and fun. All you need to do is to extend from class ```ValidationRule``` and implement the abstract methods.
