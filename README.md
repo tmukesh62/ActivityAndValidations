@@ -9,19 +9,19 @@ The idea is to isolate the business logic from the API classes and test them in 
 
 ```java
 public class FooActivityImpl extends BaseActivityImpl<FooActivityRequest, FooActivityResponse> {
-    FooActivityImpl(FooActivityRequest request) {
-        super(request);
+    FooActivityImpl() {
+        super();
     }
 
     @Override
-    protected void validateRequest() {
+    protected void validateRequest(FooActivityRequest request) {
         new FieldsValidator<>(request)
                 .with("num", new RequiredRule())
                 .validate();
     }
 
     @Override
-    protected FooActivityResponse doExecute() {
+    protected FooActivityResponse doExecute(FooActivityRequest request) {
         // add the execution logic here
         return new FooActivityResponse();
     }
@@ -32,61 +32,64 @@ For your reference, this is what ```BaseActivityImpl``` looks like:
 
 ```java
 public abstract class BaseActivityImpl<T extends Object, K extends Object> {
-    protected final T request;
-    protected K response;
-    BaseActivityImpl(T request) {
-        this.request = request;
+    BaseActivityImpl() {
     }
 
-    public K execute() {
-        logRequest();
+    public K execute(T request) {
+        logRequest(request);
 
-        validateRequest();
+        validateRequest(request);
 
-        Object o = doIdempotencyCheck();
+        Object o = doIdempotencyCheck(request);
 
-        response = null;
+        K response = null;
         if (o != null) {
-            response = doExecuteIdempotent();
+            response = doExecuteIdempotent(request);
         } else {
-            response = doExecute();
+            response = doExecute(request);
         }
 
-        logResponse();
+        logResponse(response);
 
         return response;
     }
 
-    protected abstract void validateRequest();
+    // validate the request here
+    protected abstract void validateRequest(T request);
 
-    protected K doIdempotencyCheck() {
+    protected K doIdempotencyCheck(T request) {
         // this is optional
         return null;
     }
 
-    protected abstract K doExecute();
+    // put the business logic here
+    protected abstract K doExecute(T request);
 
-    protected K doExecuteIdempotent() {
+    protected K doExecuteIdempotent(T request) {
         // this is optional
         return null;
     }
 
-    private void logRequest() {
+    private void logRequest(T request) {
         // log request here
     }
 
-    private void logResponse() {
+    private void logResponse(K response) {
         // log response here
     }
 }
-
 ```
 
 * Use it in the actual api method:
 
 ```java
-public FooResponse foo(FooRequest request) {
-  return new FooActivityImpl(request).execute();
+public class FooActivity extends Activity {
+    @Inject
+    FooActivityImpl fooActivityImpl;
+
+    public FooResponse foo(FooRequest request) {
+      return fooActivityImpl.execute(request);
+    }
 }
 ```
 
