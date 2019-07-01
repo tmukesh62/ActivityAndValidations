@@ -1,52 +1,49 @@
 package activities;
 
 public abstract class BaseActivityImpl<T extends Object, K extends Object> {
-    protected final T request;
-    protected K response;
-    BaseActivityImpl(T request) {
-        this.request = request;
+    BaseActivityImpl() {
     }
 
-    public K execute() {
-        logRequest();
+    public K execute(T request) {
+        logRequest(request);
 
-        validateRequest();
+        validateRequest(request);
 
-        Object o = doIdempotencyCheck();
+        Object o = doIdempotencyCheck(request);
 
-        response = null;
+        K response = null;
         if (o != null) {
-            response = doExecuteIdempotent();
+            response = doExecuteIdempotent(request);
         } else {
-            response = doExecute();
+            response = doExecute(request);
         }
 
-        logResponse();
+        logResponse(response);
 
         return response;
     }
 
     // validate the request here
-    protected abstract void validateRequest();
+    protected abstract void validateRequest(T request);
 
-    protected K doIdempotencyCheck() {
+    protected K doIdempotencyCheck(T request) {
         // this is optional
         return null;
     }
 
     // put the business logic here
-    protected abstract K doExecute();
+    protected abstract K doExecute(T request);
 
-    protected K doExecuteIdempotent() {
+    protected K doExecuteIdempotent(T request) {
         // this is optional
         return null;
     }
 
-    private void logRequest() {
+    private void logRequest(T request) {
         // log request here
     }
 
-    private void logResponse() {
+    private void logResponse(K response) {
         // log response here
     }
 }

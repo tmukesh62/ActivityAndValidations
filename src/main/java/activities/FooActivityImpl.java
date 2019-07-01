@@ -4,19 +4,19 @@ import validation.FieldsValidator;
 import validation.rules.RequiredRule;
 
 public class FooActivityImpl extends BaseActivityImpl<FooActivityRequest, FooActivityResponse> {
-    FooActivityImpl(FooActivityRequest request) {
-        super(request);
+    FooActivityImpl() {
+        super();
     }
 
     @Override
-    protected void validateRequest() {
+    protected void validateRequest(FooActivityRequest request) {
         new FieldsValidator<>(request)
                 .with("num", new RequiredRule())
                 .validate();
     }
 
     @Override
-    protected FooActivityResponse doExecute() {
+    protected FooActivityResponse doExecute(FooActivityRequest request) {
         // add the execution logic here
         return new FooActivityResponse();
     }
